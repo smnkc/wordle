@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Wordle TR Helper</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: sans-serif;
+            transition: color .5s, background-color .5s;
+        }
+
+        body {
+            background-color: #eee;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #333;
+            width: 100%;
+        }
+
+        nav {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            margin: 0 14px;
+            color: #333;
+        }
+
+        #btn-dark-mode {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            text-align: center;
+            justify-content: space-between;
+            max-width: 600px;
+            margin: 0 auto;
+            align-items: center;
+            padding: 5px;
+        }
+
+        input {
+            width: 30px;
+            height: 40px;
+            font-size: 35px;
+            line-height: 35px;
+            margin: 2px;
+            text-align: center;
+            text-transform: uppercase;
+            outline: none;
+            border: 2px solid #3a3a3c;
+            background-color: #eee;
+            color: #333;
+            transition: color .5s, background-color .5s;
+        }
+
+        #suggestions {
+            line-height: 27px;
+            max-width: 600px;
+            color: #333;
+        }
+
+        body.dark-mode {
+            background-color: #121213;
+        }
+
+        body.dark-mode h1, body.dark-mode a, body.dark-mode p, body.dark-mode #suggestions {
+            color: gray;
+        }
+
+        body.dark-mode input {
+            border: 2px solid #3a3a3c;
+            background: #121213;
+            color: gray;
+        }
+
+        @media only screen and (min-width: 992px) {
+            input {
+                width: 90px;
+                height: 90px;
+                font-size: 60px;
+                line-height: 60px;
+                margin: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="container">
+        <h1>Wordle TR Helper</h1>
+        <nav>
+            <a id="btn-dark-mode">Dark Mode</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <input id="l1" type="text" maxlength="1">
+        <input id="l2" type="text" maxlength="1">
+        <input id="l3" type="text" maxlength="1">
+        <input id="l4" type="text" maxlength="1">
+        <input id="l5" type="text" maxlength="1">
+    </div>
+
+    <div class="container">
+        <p id="suggestions"></p>
+    </div>
+
+    <script src="./words.js"></script>
+    <script> 
+        String.prototype.turkishToUpper = function(){
+            var string = this;
+            var letters = { "i": "İ", "ş": "Ş", "ğ": "Ğ", "ü": "Ü", "ö": "Ö", "ç": "Ç", "ı": "I" };
+            string = string.replace(/(([iışğüçö]))/g, function(letter){ return letters[letter]; });
+            return string.toUpperCase();
+        }
+        
+        function search(event) {
+            current = this;
+            if (current.getAttribute && current.value.length==current.getAttribute("maxlength") && current.nextElementSibling) {
+                current.nextElementSibling.focus();
+            }
+
+            if(event.keyCode == 8 && current.previousElementSibling) {
+                current.previousElementSibling.value = '';
+                current.previousElementSibling.focus();
+            }
+
+            if(window.l1.value == '') {
+                l1Val = "[A-Za-z_ğüşıöçĞÜŞİÖÇ]"
+            } else {
+                l1Val = window.l1.value;
+            }
+
+            if(window.l2.value == '') {
+                l2Val = "[A-Za-z_ğüşıöçĞÜŞİÖÇ]"
+            } else {
+                l2Val = window.l2.value;
+            }
+
+            if(window.l3.value == '') {
+                l3Val = "[A-Za-z_ğüşıöçĞÜŞİÖÇ]"
+            } else {
+                l3Val = window.l3.value;
+            }
+
+            if(window.l4.value == '') {
+                l4Val = "[A-Za-z_ğüşıöçĞÜŞİÖÇ]"
+            } else {
+                l4Val = window.l4.value;
+            }
+
+            if(window.l5.value == '') {
+                l5Val = "[A-Za-z_ğüşıöçĞÜŞİÖÇ]"
+            } else {
+                l5Val = window.l5.value;
+            }
+
+            let combined = (l1Val + l2Val + l3Val + l4Val + l5Val).turkishToUpper();
+            var re = new RegExp(combined, "i");
+
+            if((l1Val + l2Val + l3Val + l4Val + l5Val) == "[A-Za-z_ğüşıöçĞÜŞİÖÇ][A-Za-z_ğüşıöçĞÜŞİÖÇ][A-Za-z_ğüşıöçĞÜŞİÖÇ][A-Za-z_ğüşıöçĞÜŞİÖÇ][A-Za-z_ğüşıöçĞÜŞİÖÇ]") {
+                var results = ''; 
+            } else {
+                const matches = words.filter(value => re.test(value));
+                var results = matches.join(', ');
+            }
+
+            window.suggestions.innerHTML = results;
+        }
+
+        function toggle_dark_mode() {
+            if(window.btnDarkMode.innerHTML == 'Dark Mode') {
+                window.btnDarkMode.innerHTML = 'Light Mode';
+            } else {
+                window.btnDarkMode.innerHTML = 'Dark Mode';
+            }
+
+            document.querySelector('body').classList.toggle('dark-mode');
+        }
+
+        function is_user_wants_dark_mode() {
+            if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { 
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function toggle_dark_mode_onload() {
+            if(is_user_wants_dark_mode() == true) {
+                toggle_dark_mode();
+            }
+        }
+
+        window.l1 = document.getElementById("l1");
+        window.l2 = document.getElementById("l2");
+        window.l3 = document.getElementById("l3");
+        window.l4 = document.getElementById("l4");
+        window.l5 = document.getElementById("l5");
+        window.btnDarkMode = document.getElementById('btn-dark-mode');
+        window.suggestions = document.getElementById('suggestions')
+
+        l1.addEventListener('keyup', search, false);
+        l2.addEventListener('keyup', search, false);
+        l3.addEventListener('keyup', search, false);
+        l4.addEventListener('keyup', search, false);
+        l5.addEventListener('keyup', search, false);
+        btnDarkMode.addEventListener('click', toggle_dark_mode, false);
+        document.addEventListener("DOMContentLoaded", toggle_dark_mode_onload, false);
+    </script>
+</body>
+</html>
